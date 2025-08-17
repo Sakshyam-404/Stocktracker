@@ -1,14 +1,14 @@
 #pragma once
-#pragma once
 
 #include <vector>
 #include <string>
 #include <sstream>
+#include "CandlestickData.h"
 
 namespace StockAnalysis {
 	// Core indicators
 	double calculateMACD(const std::vector<double>& prices);
-	double calculateRSI(const std::vector<double>& prices);
+	double calculateRSI(const std::vector<CandlestickData>& candlesticks);
 	double calculateRelativeVolume(const std::vector<double>& volumes);
 
 	// Scoring helpers

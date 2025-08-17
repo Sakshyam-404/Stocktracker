@@ -20,41 +20,37 @@ namespace StockAnalysis {
 		double ema26 = prices.front();
 		const double multiplier12 = 2.0 / (12.0 + 1.0);
 		const double multiplier26 = 2.0 / (26.0 + 1.0);
-		for (size_t i = 1; i < prices.size(); ++i) {
+		for (size_t i = 1; i < prices.size(); i++) {
 			ema12 = (prices[i] * multiplier12) + (ema12 * (1 - multiplier12));
 			ema26 = (prices[i] * multiplier26) + (ema26 * (1 - multiplier26));
 		}
 		return ema12 - ema26;
 	}
 
-	double calculateRSI(const std::vector<double>& prices) {
-		if (prices.size() < 14) {
+	double calculateRSI(const std::vector<CandlestickData>& candlesticks) {
+		if (candlesticks.size() < 14) {
 			return 50.0;
 		}
-		std::vector<double> gains;
-		std::vector<double> losses;
-		gains.reserve(prices.size());
-		losses.reserve(prices.size());
-		for (size_t i = 1; i < prices.size(); ++i) {
-			double priceChange = prices[i] - prices[i - 1];
-			if (priceChange > 0) {
-				gains.push_back(priceChange);
-				losses.push_back(0.0);
-			}
-			else {
-				gains.push_back(0.0);
-				losses.push_back(-priceChange);
-			}
+		
+		// Calculate average high and low for the last 14 periods
+		double avgHigh = 0.0;
+		double avgLow = 0.0;
+		
+		for (size_t i = 0; i < 14; ++i) {
+			avgHigh += candlesticks[i].high;
+			avgLow += candlesticks[i].low;
 		}
-		if (gains.size() < 14) {
-			return 50.0;
-		}
-		double averageGain = std::accumulate(gains.begin(), gains.begin() + 14, 0.0) / 14.0;
-		double averageLoss = std::accumulate(losses.begin(), losses.begin() + 14, 0.0) / 14.0;
-		if (averageLoss == 0.0) {
+		
+		avgHigh /= 14.0;
+		avgLow /= 14.0;
+		
+		// Calculate RSI using the simplified formula
+		// RSI = 100 - (100 / (1 + (avgHigh / avgLow)))
+		if (avgLow == 0.0) {
 			return 100.0;
 		}
-		double relativeStrength = averageGain / averageLoss;
+		
+		double relativeStrength = avgHigh / avgLow;
 		return 100.0 - (100.0 / (1.0 + relativeStrength));
 	}
 
